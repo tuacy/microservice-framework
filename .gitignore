@@ -1,0 +1,9 @@
+.idea
+
+microservice-framework.iml
+
+framework-common/framework-common.iml
+
+user-manage/user-manage.iml
+
+user-manage-api/user-manage-api.iml

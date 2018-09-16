@@ -1,0 +1,20 @@
+server:
+  port: 2222
+
+spring:
+  application:
+    name: microservice-framework-user-manage
+  datasource:
+    url: jdbc:mysql://localhost:3306/mysqldev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+#  cloud:
+#    config:
+#      discovery:
+#        enabled: true #开启配置服务发现
+#        service-id: microservice-server-config #配置服务实例名称
+#      label: master #配置文件所在分支
+
