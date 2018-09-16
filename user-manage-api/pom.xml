@@ -11,5 +11,12 @@
 
     <artifactId>user-manage-api</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>tuacy.microservice.framweork</groupId>
+            <artifactId>framework-common</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
