@@ -1,9 +1,10 @@
 package com.tuacy.microservice.framework.user.manage.controller;
 
+import com.tuacy.microservice.framework.common.controller.BaseController;
+import com.tuacy.microservice.framework.common.entity.response.ResponseCodeEntity;
 import com.tuacy.microservice.framework.user.manage.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/app/")
-public class UserController {
+public class UserController extends BaseController {
 
     @Value("${version}")
     private String version;
@@ -25,7 +26,10 @@ public class UserController {
 
     @RequestMapping(value = "getUser", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity getUser() {
-        return ResponseEntity.ok(version);
+    public ResponseCodeEntity getUser() {
+        ResponseCodeEntity responseDataEntity = new ResponseCodeEntity();
+        responseDataEntity.setStatus(0);
+        responseDataEntity.setMsg("success");
+        return responseDataEntity;
     }
 }

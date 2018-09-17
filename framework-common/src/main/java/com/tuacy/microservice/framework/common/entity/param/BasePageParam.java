@@ -1,6 +1,6 @@
-package com.tuacy.microservice.framework.common.entity.request;
+package com.tuacy.microservice.framework.common.entity.param;
 
-public class BasePageRequest extends BaseRequest {
+public class BasePageParam extends BaseParam {
 
     private int pageIndex;
     private int pageSize;
