@@ -3,13 +3,13 @@ package com.tuacy.microservice.framework.common.constant;
 
 import com.tuacy.microservice.framework.common.utils.StringUtil;
 
-public enum ResultType {
+public enum ResponseResultType {
 
     SUCCESS(0, "SUCCESS"),                        //成功
     REQUEST_PARA_ERROR(1, "Parameter Error"),             //参数不正确
     JSON_PARA_EXCEPTION(2, "Json format error"),      //JSON 参数格式错误
     DB_OPERATE_ERROR(3, "Database operation failed"),         //数据库操作失败
-    USER_NO_AUTH(4, "No authority"),              //数据库操作失败
+    USER_NO_AUTH(4, "No authority"),              //没有权限
     SYS_SO_BUSY(5, "Server busy"),                     //服务器忙
     USER_NO_LOGIN(6, "User not login"),              //用户未登录
     OTHER_ERROR(7, "Other error"),              //其他错误（自定义提示内容）
@@ -19,7 +19,7 @@ public enum ResultType {
     private String desc = null;
     private String myDesc = null;   //用户自定义显示内容
 
-    ResultType(int value, String desc) {
+    ResponseResultType(int value, String desc) {
         this.value = value;
         this.desc = desc;
     }
@@ -30,7 +30,7 @@ public enum ResultType {
      * @param value
      * @return
      */
-    public static ResultType valueOf(int value) {
+    public static ResponseResultType valueOf(int value) {
         switch (value) {
             case 0:
                 return SUCCESS;

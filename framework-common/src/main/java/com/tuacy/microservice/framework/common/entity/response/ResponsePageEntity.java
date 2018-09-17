@@ -1,5 +1,8 @@
 package com.tuacy.microservice.framework.common.entity.response;
 
+/**
+ * http请求返回数据 page info + list
+ */
 public class ResponsePageEntity<T> extends ResponseListEntity<T> {
     private int pageIndex;
     private int pageCount;

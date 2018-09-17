@@ -1,24 +1,24 @@
 package com.tuacy.microservice.framework.common.entity.base;
 
-import com.tuacy.microservice.framework.common.constant.ResultType;
+import com.tuacy.microservice.framework.common.constant.ResponseResultType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseResponse<T> implements BaseEntity {
 
-    private ResultType resultType;
+    private ResponseResultType resultType;
     private List<T> data;
 
     public BaseResponse() {
-        this.resultType = ResultType.SUCCESS;
+        this.resultType = ResponseResultType.SUCCESS;
     }
 
-    public BaseResponse(ResultType resultType) {
+    public BaseResponse(ResponseResultType resultType) {
         this.resultType = resultType;
     }
 
-    public BaseResponse(ResultType resultType, T data) {
+    public BaseResponse(ResponseResultType resultType, T data) {
         this.resultType = resultType;
         this.data = new ArrayList<>();
         this.data.add(data);
@@ -30,15 +30,15 @@ public class BaseResponse<T> implements BaseEntity {
      * @param errMsg
      */
     public void setCustomErrMsg(String errMsg) {
-        this.resultType = ResultType.OTHER_ERROR;
+        this.resultType = ResponseResultType.OTHER_ERROR;
         this.resultType.setDesc(errMsg);
     }
 
-    public ResultType getResultType() {
+    public ResponseResultType getResultType() {
         return resultType;
     }
 
-    public void setResultType(ResultType resultType) {
+    public void setResultType(ResponseResultType resultType) {
         this.resultType = resultType;
     }
 

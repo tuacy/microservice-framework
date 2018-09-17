@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-@RestController
-public class BaseController {
+/**
+ * http controller base
+ */
+public abstract class BaseController {
 
     protected <F> F getAuthRequestObject(BaseParam baseParam, HttpServletRequest request) {
         if (baseParam != null) {

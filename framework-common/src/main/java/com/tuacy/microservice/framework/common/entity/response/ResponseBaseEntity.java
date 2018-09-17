@@ -1,4 +1,5 @@
 package com.tuacy.microservice.framework.common.entity.response;
 
-public class ResponseBaseEntity {
+public abstract class ResponseBaseEntity {
+
 }
