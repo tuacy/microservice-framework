@@ -2,40 +2,31 @@ package com.tuacy.microservice.framework.user.manage.entity;
 
 public class UserInfoEntity {
 
-    /**
-     * 用户id
-     */
-    private Long userId;
-    /**
-     * 用户名
-     */
-    private String userName;
-    /**
-     * 用户权限id
-     */
-    private Long roleId;
+    private String name;
+    private String phone;
+    private String password;
 
-    public Long getUserId() {
-        return userId;
+    public String getName() {
+        return name;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public Long getRoleId() {
-        return roleId;
+    public String getPassword() {
+        return password;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
