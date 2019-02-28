@@ -5,7 +5,7 @@ spring:
   application:
     name: microservice-framework-user-manage
   datasource:
-    url: jdbc:mysql://localhost:3306/mysqldev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/tuacydev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
     username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver

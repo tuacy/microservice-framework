@@ -26,9 +26,14 @@ public class UserController extends BaseController {
     @ResponseBody
     public ResponseDataEntity<UserInfoEntity> getUser() {
         ResponseDataEntity<UserInfoEntity> responseDataEntity = new ResponseDataEntity<>();
-        responseDataEntity.setMsg(ResponseResultType.SUCCESS.getDesc());
-        responseDataEntity.setStatus(ResponseResultType.SUCCESS.getValue());
-        responseDataEntity.setData(userService.getUserInfo());
+        try {
+            responseDataEntity.setMsg(ResponseResultType.SUCCESS.getDesc());
+            responseDataEntity.setStatus(ResponseResultType.SUCCESS.getValue());
+            responseDataEntity.setData(userService.getUserInfo());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return responseDataEntity;
     }
 }

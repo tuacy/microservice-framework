@@ -9,4 +9,10 @@
 
   </select>
 
+  <insert id="saveUserInfo">
+
+    insert into user (name, phone, password) values (#{userInfo.name}, #{userInfo.phone}, #{userInfo.password})
+
+  </insert>
+
 </mapper>
