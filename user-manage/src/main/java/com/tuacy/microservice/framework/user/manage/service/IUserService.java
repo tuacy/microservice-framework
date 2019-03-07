@@ -1,6 +1,6 @@
 package com.tuacy.microservice.framework.user.manage.service;
 
-import com.tuacy.microservice.framework.user.manage.entity.UserInfoEntity;
+import com.tuacy.microservice.framework.user.manage.api.response.UserInfoEntity;
 
 public interface IUserService {
 

@@ -1,6 +1,6 @@
 package com.tuacy.microservice.framework.user.manage.service.impl;
 
-import com.tuacy.microservice.framework.user.manage.entity.UserInfoEntity;
+import com.tuacy.microservice.framework.user.manage.api.response.UserInfoEntity;
 import com.tuacy.microservice.framework.user.manage.mapper.UserManageMapper;
 import com.tuacy.microservice.framework.user.manage.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;

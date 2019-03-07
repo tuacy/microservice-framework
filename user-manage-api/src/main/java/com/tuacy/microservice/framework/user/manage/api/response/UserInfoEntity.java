@@ -1,4 +1,4 @@
-package com.tuacy.microservice.framework.user.manage.entity;
+package com.tuacy.microservice.framework.user.manage.api.response;
 
 public class UserInfoEntity {
 
