@@ -7,3 +7,7 @@ framework-common/framework-common.iml
 user-manage/user-manage.iml
 
 user-manage-api/user-manage-api.iml
+
+quartz-manage/quartz-manage.iml
+
+quartz-manage-api/quartz-manage-api.iml

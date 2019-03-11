@@ -1,0 +1,44 @@
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
+#
+#  instance:
+#    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+#    prefer-ip-address: true
+#    leaseRenewalIntervalInSeconds: 5
+#    leaseExpirationDurationInSeconds: 5
+
+mybatis:
+  typeAliasesPackage: com.tuacy.microservice.framework.user.manage.model
+  mapperLocations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 分页配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+#hystrix:
+#  threadpool:
+#    default:
+#      coreSize: 200 ##并发执行的最大线程数，默认10
+#      maxQueueSize: 200 ##BlockingQueue的最大队列数
+#      queueSizeRejectionThreshold: 200 ##即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
+#  command:
+#    default:
+#      execution:
+#        timeout:
+#          enabled: false
+#      circuitBreaker:
+#        errorThresholdPercentage: 50 # 50%
+#        sleepWindowInMilliseconds: 100000 # 100s
+#    customCommandKey:
+#      fallback:
+#        enabled: false
+#      circuitBreaker:
+#        errorThresholdPercentage: 75 # 75%
+#        sleepWindowInMilliseconds: 15000 # 15s

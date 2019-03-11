@@ -12,6 +12,8 @@
         <module>user-manage</module>
         <module>framework-common</module>
         <module>user-manage-api</module>
+        <module>quartz-manage</module>
+        <module>quartz-manage-api</module>
     </modules>
 
     <name>microservice-framwork</name>
