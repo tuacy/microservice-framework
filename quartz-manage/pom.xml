@@ -78,7 +78,7 @@
 
         <dependency>
             <groupId>tuacy.microservice.framweork</groupId>
-            <artifactId>quartz-manage-api1</artifactId>
+            <artifactId>quartz-manage-api</artifactId>
             <version>${parent.version}</version>
         </dependency>
 
