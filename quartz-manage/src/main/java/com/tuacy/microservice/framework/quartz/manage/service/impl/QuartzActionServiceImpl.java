@@ -195,7 +195,6 @@ public class QuartzActionServiceImpl implements IQuartzActionService {
             map.put(TASK_ID_KEY, jobName);
             Trigger trigger = TriggerBuilder.newTrigger()
                     .withIdentity(jobName, jobGroupName)// 触发器名,触发器组
-                    .startAt(DateBuilder.futureDate(1, DateBuilder.IntervalUnit.SECOND))
                     .withSchedule(CronScheduleBuilder.cronSchedule(jobTime)) // // 触发器时间设定
                     .startNow()
                     .build();
