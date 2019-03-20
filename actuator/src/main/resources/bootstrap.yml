@@ -1,0 +1,13 @@
+server:
+  port: 2224
+
+spring:
+  application:
+    name: microservice-framework-user-manage
+  cloud:
+    config: # spring could config client
+      discovery:
+        enabled: true #开启配置服务发现
+        service-id: microservice-center-config-server #配置服务实例名称
+      label: master #配置文件所在分支
+
