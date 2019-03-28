@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service(value = "user-service")
 public class UserServiceImpl implements IUserService {
 
+
     private UserManageMapper userManageMapper;
+
 
     @Autowired
     public void setUserManageMapper(UserManageMapper userManageMapper) {

@@ -1,6 +1,9 @@
 server:
   port: 2222
-
+url: # 我们自定义的starter
+  protocol: http
+  host: 192.168.0.1
+  port: 8080
 spring:
   application:
     name: microservice-framework-user-manage
@@ -17,4 +20,5 @@ spring:
         enabled: true #开启配置服务发现
         service-id: microservice-center-config-server #配置服务实例名称
       label: master #配置文件所在分支
+
 

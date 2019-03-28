@@ -83,6 +83,12 @@
             <version>${parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.tuacy.starter</groupId>
+            <artifactId>url-decoration</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -90,6 +96,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

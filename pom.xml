@@ -15,6 +15,7 @@
         <module>quartz-manage</module>
         <module>quartz-manage-api</module>
         <module>actuator</module>
+        <module>url-decoration</module>
     </modules>
 
     <name>microservice-framwork</name>
