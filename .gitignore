@@ -15,3 +15,5 @@ quartz-manage-api/quartz-manage-api.iml
 actuator/actuator.iml
 
 url-decoration/url-decoration.iml
+
+mybatis-interceptor/mybatis-interceptor.iml

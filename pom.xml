@@ -16,6 +16,7 @@
         <module>quartz-manage-api</module>
         <module>actuator</module>
         <module>url-decoration</module>
+        <module>mybatis-interceptor</module>
     </modules>
 
     <name>microservice-framwork</name>

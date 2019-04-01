@@ -1,0 +1,28 @@
+server:
+  port: 2223
+spring:
+  application:
+    name: mybatis-interceptor
+  datasource:
+    url: jdbc:mysql://localhost:3306/tuacydev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
+#
+#  instance:
+#    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+#    prefer-ip-address: true
+#    leaseRenewalIntervalInSeconds: 5
+#    leaseExpirationDurationInSeconds: 5
+
+mybatis:
+  typeAliasesPackage: com.tuacy.mybatis.interceptor.model
+  mapperLocations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
