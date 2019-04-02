@@ -1,7 +1,7 @@
 package com.tuacy.mybatis.interceptor.config;
 
-import com.tuacy.mybatis.interceptor.interceptor.MyBatisPageInterceptor;
-import com.tuacy.mybatis.interceptor.interceptor.MyBatisTableSplitInterceptor;
+import com.tuacy.mybatis.interceptor.interceptor.PageInterceptor;
+import com.tuacy.mybatis.interceptor.interceptor.TableSplitInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 public class MybatisConfiguration {
 
     @Bean
-    public MyBatisPageInterceptor batisPageInterceptor() {
-        return new MyBatisPageInterceptor();
+    public PageInterceptor pageInterceptor() {
+        return new PageInterceptor();
     }
 
     @Bean
-    public MyBatisTableSplitInterceptor batisTableSplitInterceptor() {
-        return new MyBatisTableSplitInterceptor();
+    public TableSplitInterceptor tableSplitInterceptor() {
+        return new TableSplitInterceptor();
     }
 
 }

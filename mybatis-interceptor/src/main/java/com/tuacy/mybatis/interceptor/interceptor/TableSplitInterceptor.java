@@ -16,7 +16,7 @@ import java.util.Properties;
                 args = {Connection.class, Integer.class}
         )
 })
-public class MyBatisTableSplitInterceptor implements Interceptor {
+public class TableSplitInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {

@@ -18,7 +18,7 @@ import java.util.Properties;
                 args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}
         )
 })
-public class MyBatisPageInterceptor implements Interceptor {
+public class PageInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
