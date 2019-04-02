@@ -24,5 +24,5 @@ spring:
 mybatis:
   typeAliasesPackage: com.tuacy.mybatis.interceptor.model
   mapperLocations: classpath:mapper/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
