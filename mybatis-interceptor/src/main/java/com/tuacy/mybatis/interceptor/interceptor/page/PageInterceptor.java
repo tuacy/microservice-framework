@@ -1,21 +1,21 @@
-package com.tuacy.mybatis.interceptor.interceptor;
+package com.tuacy.mybatis.interceptor.interceptor.page;
 
 import com.tuacy.mybatis.interceptor.interceptor.utils.ReflectHelper;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.xml.bind.PropertyException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Mybatis - 分页拦截器
@@ -25,12 +25,6 @@ import java.util.Set;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
 })
 public class PageInterceptor implements Interceptor {
-
-    /**
-     * 先在mapper里面方法上的参数,上查找是否有PageView类型的参数，如果没有，在去查找pageNo，pageSize参数。多重保证
-     */
-    private final static String PAGE_NO = "pageNo";
-    private final static String PAGE_SIZE = "pageSize";
 
     public static final String DATABASE_TYPE_MYSQL = "mysql";
     public static final String DATABASE_TYPE_ORACLE = "oracle";
@@ -47,7 +41,15 @@ public class PageInterceptor implements Interceptor {
     /**
      * 当需要写手动count查询是，方法对应的后缀名
      */
-    public static final String PROPERTIES_KEY_COUNT_SUFFIX = "_COUNT";
+    public static final String PROPERTIES_KEY_COUNT_SUFFIX = "count_suffix";
+
+    /**
+     * 先在mapper里面方法上的参数,上查找是否有PageView类型的参数，如果没有，在去查找pageNo，pageSize参数。多重保证
+     */
+    private final static String PAGE_NO = "pageNo";
+    private final static String PAGE_SIZE = "pageSize";
+
+    private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
     /**
      * 数据库类型
@@ -66,51 +68,38 @@ public class PageInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
+            Executor executor = (Executor) invocation.getTarget();
             Object[] args = invocation.getArgs();
             MappedStatement mappedStatement = (MappedStatement) args[0];
             Object parameter = args[1];
             ResultHandler resultHandler = (ResultHandler) args[3];
-            Executor executor = (Executor) invocation.getTarget();
             // 对应的方法是否添加了分页拦截标志 -- PROPERTIES_KEY_PAGE_EXPRESSION_MATCHING
             if (mappedStatement.getId().matches(pageExpressionMatching)) {
                 BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+                String sql = boundSql.getSql();
                 // 获取mapper里面方法上的参数
                 Object parameterObject = boundSql.getParameterObject();
                 if (parameterObject != null) {
-                    // 获取分页参数对象
+                    // 获取分页参数对象信息
                     PageView pageView = getPageInfoFromParameter(parameterObject);
                     if (pageView != null) {
-                        String sql = boundSql.getSql();
-                        // 获取总条数
+                        // 1. 获取总条数
                         if (pageView.isDoCount()) {
-                            Long totalCount;
-                            //先判断是否存在手写的 count 查询
-                            if (isEmpty(countSuffix)) {
-                                totalCount = executeAutoTotalCount(executor, sql, mappedStatement, boundSql, parameterObject, resultHandler);
-                            } else {
-                                String countMappedStatementId = mappedStatement.getId() + countSuffix;
-                                MappedStatement countMappedStatement = getExistedMappedStatement(mappedStatement.getConfiguration(), countMappedStatementId);
-                                if (countMappedStatement == null) {
-                                    // 自动做分页处理
-                                    totalCount = executeAutoTotalCount(executor, sql, mappedStatement, boundSql, parameterObject, resultHandler);
-                                } else {
-                                    totalCount = executeManualTotalCount(executor, countMappedStatement, parameter, boundSql, resultHandler);
-                                }
-                            }
+                            Long totalCount = getCount(executor, mappedStatement, parameter, resultHandler);
                             if (totalCount != null) {
                                 pageView.setTotalCount(totalCount);
                             }
                         }
-                        // 分页查询对应的sql
+                        // 2. 分页查询对应的sql
                         String pageSql = buildPageSql(sql, pageView);
                         // 将分页sql语句反射回BoundSql里面去
-                        ReflectHelper.setValueByFieldName(boundSql, "sql", pageSql);
+                        resetSql2Invocation(invocation, pageSql);
                     }
                 }
             }
         } catch (Exception e) {
             // 任何一个地方有异常，都去执行原始操作
-            return invocation.proceed();
+            // ignore
         }
 
         return invocation.proceed();
@@ -199,6 +188,44 @@ public class PageInterceptor implements Interceptor {
             exp.printStackTrace();
         }
         return pageView;
+    }
+
+
+    /**
+     * 获取总的条数
+     *
+     * @param executor        Executor
+     * @param mappedStatement MappedStatement
+     * @param parameter       Object
+     * @param resultHandler   ResultHandler
+     * @return 总条数
+     * @throws SQLException 异常
+     */
+    private Long getCount(Executor executor, MappedStatement mappedStatement, Object parameter, ResultHandler resultHandler)
+            throws SQLException {
+        BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+        String sql = boundSql.getSql();
+        Object parameterObject = boundSql.getParameterObject();
+        Long totalCount;
+        MappedStatement countMappedStatement;
+        //先判断是否存在手写的count查询
+        if (isEmpty(countSuffix)) {
+            // 没有配置自定义count查询的后缀
+            String countMappedStatementId = mappedStatement.getId() + "_COUNT";
+            countMappedStatement = generalCountMappedStatement(mappedStatement, countMappedStatementId);
+            totalCount = executeAutoTotalCount(executor, sql, countMappedStatement, boundSql, parameterObject, resultHandler);
+        } else {
+            String countMappedStatementId = mappedStatement.getId() + countSuffix;
+            countMappedStatement = getExistedMappedStatement(mappedStatement.getConfiguration(), countMappedStatementId);
+            if (countMappedStatement == null) {
+                // 自动做分页处理
+                countMappedStatement = generalCountMappedStatement(mappedStatement, countMappedStatementId);
+                totalCount = executeAutoTotalCount(executor, sql, countMappedStatement, boundSql, parameterObject, resultHandler);
+            } else {
+                totalCount = executeManualTotalCount(executor, countMappedStatement, parameter, boundSql, resultHandler);
+            }
+        }
+        return totalCount;
     }
 
     /**
@@ -310,6 +337,106 @@ public class PageInterceptor implements Interceptor {
         BoundSql countBoundSql = mappedStatement.getBoundSql(parameter);
         Object countResultList = executor.query(mappedStatement, parameter, RowBounds.DEFAULT, resultHandler, countKey, countBoundSql);
         return ((Number) ((List) countResultList).get(0)).longValue();
+    }
+
+    /**
+     * 将sql反射回方法中
+     *
+     * @param invocation Invocation
+     * @param sql        sql
+     * @throws SQLException 异常
+     */
+    private void resetSql2Invocation(Invocation invocation, String sql) throws SQLException {
+        final Object[] args = invocation.getArgs();
+        MappedStatement statement = (MappedStatement) args[0];
+        Object parameterObject = args[1];
+        BoundSql boundSql = statement.getBoundSql(parameterObject);
+        MappedStatement newStatement = generalMappedStatement(statement, new BoundSqlSqlSource(boundSql));
+        MetaObject msObject = MetaObject.forObject(newStatement, new DefaultObjectFactory(), new DefaultObjectWrapperFactory(), new DefaultReflectorFactory());
+        msObject.setValue("sqlSource.boundSql.sql", sql);
+        args[0] = newStatement;
+    }
+
+    private class BoundSqlSqlSource implements SqlSource {
+        private BoundSql boundSql;
+
+        BoundSqlSqlSource(BoundSql boundSql) {
+            this.boundSql = boundSql;
+        }
+
+        @Override
+        public BoundSql getBoundSql(Object parameterObject) {
+            return boundSql;
+        }
+    }
+
+    /**
+     * 创建新的 MappedStatement
+     *
+     * @param mappedStatement MappedStatement
+     * @param sqlSource       SqlSource
+     * @return MappedStatement
+     */
+    private MappedStatement generalMappedStatement(MappedStatement mappedStatement, SqlSource sqlSource) {
+        MappedStatement.Builder builder =
+                new MappedStatement.Builder(mappedStatement.getConfiguration(), mappedStatement.getId(), sqlSource, mappedStatement.getSqlCommandType());
+        builder.resource(mappedStatement.getResource());
+        builder.fetchSize(mappedStatement.getFetchSize());
+        builder.statementType(mappedStatement.getStatementType());
+        builder.keyGenerator(mappedStatement.getKeyGenerator());
+        if (mappedStatement.getKeyProperties() != null && mappedStatement.getKeyProperties().length != 0) {
+            StringBuilder keyProperties = new StringBuilder();
+            for (String keyProperty : mappedStatement.getKeyProperties()) {
+                keyProperties.append(keyProperty).append(",");
+            }
+            keyProperties.delete(keyProperties.length() - 1, keyProperties.length());
+            builder.keyProperty(keyProperties.toString());
+        }
+        builder.timeout(mappedStatement.getTimeout());
+        builder.parameterMap(mappedStatement.getParameterMap());
+        builder.resultMaps(mappedStatement.getResultMaps());
+        builder.resultSetType(mappedStatement.getResultSetType());
+        builder.cache(mappedStatement.getCache());
+        builder.flushCacheRequired(mappedStatement.isFlushCacheRequired());
+        builder.useCache(mappedStatement.isUseCache());
+
+        return builder.build();
+    }
+
+    /**
+     * 新建count查询对应的MappedStatement
+     *
+     * @param mappedStatement   MappedStatement
+     * @param mappedStatementId 方法id
+     * @return MappedStatement对象
+     */
+    private static MappedStatement generalCountMappedStatement(MappedStatement mappedStatement, String mappedStatementId) {
+        MappedStatement.Builder builder = new MappedStatement.Builder(mappedStatement.getConfiguration(), mappedStatementId, mappedStatement.getSqlSource(), mappedStatement.getSqlCommandType());
+        builder.resource(mappedStatement.getResource());
+        builder.fetchSize(mappedStatement.getFetchSize());
+        builder.statementType(mappedStatement.getStatementType());
+        builder.keyGenerator(mappedStatement.getKeyGenerator());
+        if (mappedStatement.getKeyProperties() != null && mappedStatement.getKeyProperties().length != 0) {
+            StringBuilder keyProperties = new StringBuilder();
+            for (String keyProperty : mappedStatement.getKeyProperties()) {
+                keyProperties.append(keyProperty).append(",");
+            }
+            keyProperties.delete(keyProperties.length() - 1, keyProperties.length());
+            builder.keyProperty(keyProperties.toString());
+        }
+        builder.timeout(mappedStatement.getTimeout());
+        builder.parameterMap(mappedStatement.getParameterMap());
+        //count查询返回值Long
+        List<ResultMap> resultMaps = new ArrayList<ResultMap>();
+        ResultMap resultMap = new ResultMap.Builder(mappedStatement.getConfiguration(), mappedStatement.getId(), Long.class, EMPTY_RESULT_MAPPING).build();
+        resultMaps.add(resultMap);
+        builder.resultMaps(resultMaps);
+        builder.resultSetType(mappedStatement.getResultSetType());
+        builder.cache(mappedStatement.getCache());
+        builder.flushCacheRequired(mappedStatement.isFlushCacheRequired());
+        builder.useCache(mappedStatement.isUseCache());
+
+        return builder.build();
     }
 
     /**

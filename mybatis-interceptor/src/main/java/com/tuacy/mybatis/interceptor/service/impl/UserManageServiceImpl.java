@@ -1,6 +1,7 @@
 package com.tuacy.mybatis.interceptor.service.impl;
 
 import com.tuacy.mybatis.interceptor.entity.vo.UserInfoVo;
+import com.tuacy.mybatis.interceptor.interceptor.page.PageView;
 import com.tuacy.mybatis.interceptor.mapper.UserManageMapper;
 import com.tuacy.mybatis.interceptor.service.IUserManageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class UserManageServiceImpl implements IUserManageService {
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     @Override
     public List<UserInfoVo> getAllUserList() {
-        return userManageMapper.getAllUserList();
+        PageView pageView = new PageView();
+        List<UserInfoVo> retList = userManageMapper.getAllUserListPage(pageView);
+        pageView.setLists(retList);
+        return retList;
     }
 }

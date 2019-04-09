@@ -1,4 +1,4 @@
-package com.tuacy.mybatis.interceptor.interceptor;
+package com.tuacy.mybatis.interceptor.interceptor.page;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.tuacy.mybatis.interceptor.config;
 
-import com.tuacy.mybatis.interceptor.interceptor.LogInterceptor;
-import com.tuacy.mybatis.interceptor.interceptor.PageInterceptor;
-import com.tuacy.mybatis.interceptor.interceptor.TableSplitInterceptor;
+import com.tuacy.mybatis.interceptor.interceptor.log.LogInterceptor;
+import com.tuacy.mybatis.interceptor.interceptor.page.PageInterceptor;
+import com.tuacy.mybatis.interceptor.interceptor.tablesplit.TableSplitInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

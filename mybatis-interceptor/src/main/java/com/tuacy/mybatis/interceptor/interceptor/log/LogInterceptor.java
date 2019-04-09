@@ -1,4 +1,4 @@
-package com.tuacy.mybatis.interceptor.interceptor;
+package com.tuacy.mybatis.interceptor.interceptor.log;
 
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;

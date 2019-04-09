@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.tuacy.mybatis.interceptor.mapper.UserManageMapper" >
+<mapper namespace="com.tuacy.mybatis.interceptor.mapper.UserManageMapper">
 
-    <select id="getAllUserList" resultType="com.tuacy.mybatis.interceptor.entity.vo.UserInfoVo">
+    <select id="getAllUserListPage" resultType="com.tuacy.mybatis.interceptor.entity.vo.UserInfoVo">
 
     SELECT
         us.name as userName,
@@ -11,5 +11,13 @@
     FROM user us
 
   </select>
+
+<!--    <select id="getAllUserListPage_COUNT" resultType="java.lang.Long">-->
+
+<!--    SELECT-->
+<!--        count(*)-->
+<!--    FROM user us-->
+
+<!--  </select>-->
 
 </mapper>

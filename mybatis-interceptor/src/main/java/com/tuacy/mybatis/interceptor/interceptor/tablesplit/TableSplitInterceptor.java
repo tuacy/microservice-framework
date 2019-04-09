@@ -1,4 +1,4 @@
-package com.tuacy.mybatis.interceptor.interceptor;
+package com.tuacy.mybatis.interceptor.interceptor.tablesplit;
 
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.plugin.*;
