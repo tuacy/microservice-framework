@@ -16,7 +16,13 @@ public class MybatisConfiguration {
 
     @Bean
     public PageInterceptor pageInterceptor() {
-        return new PageInterceptor();
+        PageInterceptor interceptor = new PageInterceptor();
+        Properties properties = new Properties();
+        properties.setProperty(PageInterceptor.PROPERTIES_KEY_DATABASE_TYPE, PageInterceptor.DATABASE_TYPE_MYSQL);
+        properties.setProperty(PageInterceptor.PROPERTIES_KEY_PAGE_EXPRESSION_MATCHING, ".*Page.*");
+        properties.setProperty(PageInterceptor.PROPERTIES_KEY_COUNT_SUFFIX, "_COUNT");
+        interceptor.setProperties(properties);
+        return interceptor;
     }
 
     @Bean
