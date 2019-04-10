@@ -2,7 +2,7 @@ package com.tuacy.mybatis.interceptor.config;
 
 import com.tuacy.mybatis.interceptor.interceptor.log.LogInterceptor;
 import com.tuacy.mybatis.interceptor.interceptor.page.PageInterceptor;
-import com.tuacy.mybatis.interceptor.interceptor.tablesplit.TableSplitInterceptor;
+import com.tuacy.mybatis.interceptor.interceptor.tableshard.TableShardInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,8 +26,8 @@ public class MybatisConfiguration {
     }
 
     @Bean
-    public TableSplitInterceptor tableSplitInterceptor() {
-        return new TableSplitInterceptor();
+    public TableShardInterceptor tableSplitInterceptor() {
+        return new TableShardInterceptor();
     }
 
     @Bean
