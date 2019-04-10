@@ -2,9 +2,18 @@ package com.tuacy.mybatis.interceptor.entity.vo;
 
 public class UserInfoVo {
 
+    private String pkId;
     private String userName;
     private String password;
     private String phone;
+
+    public String getPkId() {
+        return pkId;
+    }
+
+    public void setPkId(String pkId) {
+        this.pkId = pkId;
+    }
 
     public String getUserName() {
         return userName;

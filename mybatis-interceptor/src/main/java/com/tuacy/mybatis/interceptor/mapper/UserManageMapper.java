@@ -13,8 +13,15 @@ import java.util.List;
 @Repository
 public interface UserManageMapper {
 
+    List<UserInfoVo> getAllUserList();
+
     List<UserInfoVo> getAllUserListPage(@Param("pageView") PageView pageView);
 
-//    List<UserInfoVo> getAllUserListPage_COUNT(@Param("pageView") PageView pageView);
+    List<UserInfoVo> getAllUserListPageManualCount(@Param("pageView") PageView pageView);
+
+    /**
+     * 和getAllUserListPageManualCount查询对应，自定义一个count查询语句
+     */
+    Long getAllUserListPageManualCount_COUNT(@Param("pageView") PageView pageView);
 
 }

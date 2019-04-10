@@ -2,7 +2,7 @@ package com.tuacy.mybatis.interceptor.interceptor.page;
 
 import java.util.List;
 
-public class PageView {
+public class PageView<T> {
 
     /**
      * 默认每一页的数据大小
@@ -10,7 +10,7 @@ public class PageView {
     private static final int PAGE_SIZE = 10;
 
     /**
-     * 当前需要查询的页码
+     * 当前需要查询的页码 ,从0开始
      */
     private int pageNo;
     /**
@@ -33,10 +33,10 @@ public class PageView {
     /**
      * 最终查询出来的数据
      */
-    private List<?> lists;
+    private List<T> lists;
 
     public PageView() {
-        this(1);
+        this(0);
     }
 
     /**
@@ -62,7 +62,7 @@ public class PageView {
      * @param doCount  是否需要进行count查询
      */
     public PageView(int pageNo, int pageSize, boolean doCount) {
-        this.pageNo = pageNo > 0 ? pageNo : PAGE_SIZE;
+        this.pageNo = pageNo;
         this.pageSize = pageSize;
         this.doCount = doCount;
     }
@@ -74,16 +74,16 @@ public class PageView {
      * @param records  结果集合
      */
 
-    public void setQueryResult(long rowCount, List<?> records) {
+    public void setQueryResult(long rowCount, List<T> records) {
         setLists(records);
     }
 
 
-    public List<?> getLists() {
+    public List<T> getLists() {
         return lists;
     }
 
-    public void setLists(List<?> lists) {
+    public void setLists(List<T> lists) {
         this.lists = lists;
     }
 

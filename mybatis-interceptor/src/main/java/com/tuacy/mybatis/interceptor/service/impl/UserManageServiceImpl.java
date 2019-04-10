@@ -23,9 +23,27 @@ public class UserManageServiceImpl implements IUserManageService {
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     @Override
     public List<UserInfoVo> getAllUserList() {
-        PageView pageView = new PageView();
-        List<UserInfoVo> retList = userManageMapper.getAllUserListPage(pageView);
-        pageView.setLists(retList);
-        return retList;
+        return userManageMapper.getAllUserList();
+    }
+
+    /**
+     * 分页获取所有的用户列表信息
+     */
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
+    @Override
+    public PageView<UserInfoVo> getUserListPage(PageView<UserInfoVo> pageView) {
+        pageView.setLists(userManageMapper.getAllUserListPage(pageView));
+        return pageView;
+    }
+
+
+    /**
+     * 分页获取所有的用户列表信息 -- 自定义count查询
+     */
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
+    @Override
+    public PageView<UserInfoVo> getUserListPageManualCount(PageView<UserInfoVo> pageView) {
+        pageView.setLists(userManageMapper.getAllUserListPageManualCount(pageView));
+        return pageView;
     }
 }
