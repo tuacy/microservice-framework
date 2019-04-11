@@ -24,5 +24,5 @@ public @interface TableShard {
     /**
      * 分表条件key, 通过key去参数列表里取对应的值，作为分表条件处理
      */
-    String[] shardParamKey();
+    String[] shardParamKey() default {};
 }

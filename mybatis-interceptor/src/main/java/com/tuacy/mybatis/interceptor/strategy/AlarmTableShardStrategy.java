@@ -2,53 +2,73 @@ package com.tuacy.mybatis.interceptor.strategy;
 
 import com.tuacy.mybatis.interceptor.interceptor.tableshard.ITableShardStrategy;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.ReflectorFactory;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.reflection.factory.ObjectFactory;
+import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
-import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * 告警表分表策略
+ * 告警表分表策略 -- 根据告警发生时间来分表,天
+ * shardParamKey 对应时间格式 YYYY-MM-dd
  */
 public class AlarmTableShardStrategy implements ITableShardStrategy {
 
+    private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
+    private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
+    private static final ReflectorFactory REFLECTOR_FACTORY = new DefaultReflectorFactory();
+
+    /**
+     * 分表策略
+     *
+     * @param metaStatementHandler MetaObject包装的RoutingStatementHandler对象
+     * @param tableName            原始表名
+     * @param shardParamKey        可以在mapper文件的方法里面传递一些参数key过来，在分表策略里面通过key获取到对应的值
+     * @return 包装之后的sql语句
+     */
+    @SuppressWarnings("unchecked")
     @Override
     public String tableShard(MetaObject metaStatementHandler, String tableName, String[] shardParamKey) throws Exception {
         BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
         String originSql = boundSql.getSql();
-        boundSql.getParameterMappings();
-        String userCode = shardParamKey[0];
+        if (shardParamKey == null || shardParamKey.length == 0) {
+            return originSql;
+        }
+        String alarmOccurTimeParamKey = shardParamKey[0];
+        String alarmOccurTime = null;
         Object parameterObject = metaStatementHandler.getValue("delegate.boundSql.parameterObject");//获取参数
         if (parameterObject instanceof String) {
-            // 参数是一个String
-            originSql = originSql.replaceAll(tableName, tableName + "_" + parameterObject);
+            // 参数是一个String,那我们就认为这个String就是用来分表的参数了
+            alarmOccurTime = (String) parameterObject;
         } else if (parameterObject instanceof Map) {
             // 参数是一个Map
             Map<String, Object> map = (Map<String, Object>) parameterObject;
             Set<String> set = map.keySet();
-            String value = "";
             for (String key : set) {
-                if (key.equals(userCode)) {
-                    value = map.get(userCode).toString();
+                if (key.equals(alarmOccurTimeParamKey)) {
+                    alarmOccurTime = map.get(alarmOccurTimeParamKey).toString();
                     break;
                 }
             }
-            originSql = originSql.replaceAll(tableName, tableName + "_" + value);
         } else {
             // 参数为某个对象
-            Class<?> clazz = parameterObject.getClass();
-            String value = "";
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                String fieldName = field.getName();
-                if (fieldName.equals(userCode)) {
-                    value = field.get(parameterObject).toString();
-                    break;
-                }
-            }
-            originSql = originSql.replaceAll(tableName, tableName + "_" + value);
+            MetaObject metaParamObject = MetaObject.forObject(parameterObject, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, REFLECTOR_FACTORY);
+            alarmOccurTime = (String) metaParamObject.getValue(alarmOccurTimeParamKey);
+        }
+        // 确定表名字
+        if (alarmOccurTime != null) {
+            SimpleDateFormat parseSdf = new SimpleDateFormat("YYYY-MM-dd");
+            Date occurDate = parseSdf.parse(alarmOccurTime);
+            SimpleDateFormat formatSdf = new SimpleDateFormat("YYYYMMdd");
+            String shardTableName = formatSdf.format(occurDate);
+            return originSql.replaceAll(tableName, shardTableName);
         }
         return originSql;
     }

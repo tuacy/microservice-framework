@@ -6,8 +6,11 @@ import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -48,6 +51,9 @@ public class PageInterceptor implements Interceptor {
     private final static String AUTO_COUNT_MAPPED_STATEMENT_SUFFIX = "_AUTO_COUNT";
 
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
+    private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
+    private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
+    private static final ReflectorFactory REFLECTOR_FACTORY = new DefaultReflectorFactory();
 
     /**
      * 数据库类型
@@ -318,17 +324,17 @@ public class PageInterceptor implements Interceptor {
      *
      * @param invocation Invocation
      * @param sql        sql
-     * @throws SQLException 异常
      */
-    private void resetSql2Invocation(Invocation invocation, String sql) throws SQLException {
+    private void resetSql2Invocation(Invocation invocation, String sql) {
         final Object[] args = invocation.getArgs();
         MappedStatement statement = (MappedStatement) args[0];
         Object parameterObject = args[1];
         BoundSql boundSql = statement.getBoundSql(parameterObject);
-        MappedStatement newStatement = generalMappedStatement(statement, new BoundSqlSqlSource(boundSql));
-        MetaObject msObject = MetaObject.forObject(newStatement, new DefaultObjectFactory(), new DefaultObjectWrapperFactory(), new DefaultReflectorFactory());
+        MappedStatement newMappedStatement = generalMappedStatement(statement, new BoundSqlSqlSource(boundSql));
+        // MetaObject mybatis里面提供的一个工具类，类似反射的效果
+        MetaObject msObject = MetaObject.forObject(newMappedStatement, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, REFLECTOR_FACTORY);
         msObject.setValue("sqlSource.boundSql.sql", sql);
-        args[0] = newStatement;
+        args[0] = newMappedStatement;
     }
 
     private class BoundSqlSqlSource implements SqlSource {
@@ -381,11 +387,12 @@ public class PageInterceptor implements Interceptor {
      * 新建count查询对应的MappedStatement
      *
      * @param mappedStatement   MappedStatement
-     * @param mappedStatementId 方法id
+     * @param mappedStatementId 方法id，自己取了一个名字
      * @return MappedStatement对象
      */
     private static MappedStatement generalCountMappedStatement(MappedStatement mappedStatement, String mappedStatementId) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(mappedStatement.getConfiguration(), mappedStatementId, mappedStatement.getSqlSource(), mappedStatement.getSqlCommandType());
+        MappedStatement.Builder builder =
+                new MappedStatement.Builder(mappedStatement.getConfiguration(), mappedStatementId, mappedStatement.getSqlSource(), mappedStatement.getSqlCommandType());
         builder.resource(mappedStatement.getResource());
         builder.fetchSize(mappedStatement.getFetchSize());
         builder.statementType(mappedStatement.getStatementType());
@@ -401,7 +408,7 @@ public class PageInterceptor implements Interceptor {
         builder.timeout(mappedStatement.getTimeout());
         builder.parameterMap(mappedStatement.getParameterMap());
         //count查询返回值Long
-        List<ResultMap> resultMaps = new ArrayList<ResultMap>();
+        List<ResultMap> resultMaps = new ArrayList<>();
         ResultMap resultMap = new ResultMap.Builder(mappedStatement.getConfiguration(), mappedStatement.getId(), Long.class, EMPTY_RESULT_MAPPING).build();
         resultMaps.add(resultMap);
         builder.resultMaps(resultMaps);
