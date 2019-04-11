@@ -16,7 +16,7 @@ public class YearTableShardStrategy implements ITableShardStrategy {
 
         BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
         String originSql = boundSql.getSql();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
         String newTableName = tableName + "_" + sdf.format(new Date());
         return originSql.replaceAll(tableName, newTableName);
     }

@@ -1,16 +1,15 @@
 package com.tuacy.mybatis.interceptor.interceptor.tableshard;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 分表注解
  */
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface TableShard {
+@Inherited
+@Documented
+public @interface TableShardAnnotation {
     /**
      * 待分表的表名
      */

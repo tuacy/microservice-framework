@@ -14,6 +14,7 @@ import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.Properties;
 
@@ -44,15 +45,12 @@ public class TableShardInterceptor implements Interceptor {
                 String originSql = boundSql.getSql();
                 if (!StringUtils.isEmpty(originSql)) {
                     MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
-                    String id = mappedStatement.getId();
-                    String className = id.substring(0, id.lastIndexOf("."));
-                    Class<?> clazz = Class.forName(className);
-                    // 判断方法上是否添加了 TableShard 注解，因为只有添加了TableShard注解的方法我们才会去做分表处理
-                    TableShard tableShard = clazz.getAnnotation(TableShard.class);
-                    if (tableShard != null) {
-                        String tableName = tableShard.tableName();
-                        Class<?> strategyClazz = tableShard.shadeStrategy();
-                        String[] shardParamKey = tableShard.shardParamKey();
+                    // 判断方法上是否添加了 TableShardAnnotation 注解，因为只有添加了TableShard注解的方法我们才会去做分表处理
+                    TableShardAnnotation tableShardAnnotation = getTableShardAnnotation(mappedStatement);
+                    if (tableShardAnnotation != null) {
+                        String tableName = tableShardAnnotation.tableName();
+                        Class<?> strategyClazz = tableShardAnnotation.shadeStrategy();
+                        String[] shardParamKey = tableShardAnnotation.shardParamKey();
                         ITableShardStrategy tableStrategy = (ITableShardStrategy) strategyClazz.newInstance();
                         String newSql = tableStrategy.tableShard(metaStatementHandler, tableName, shardParamKey);
                         // 把新语句设置回去
@@ -77,5 +75,30 @@ public class TableShardInterceptor implements Interceptor {
     @Override
     public void setProperties(Properties properties) {
 
+    }
+
+    /**
+     * 获取方法上的TableShardAnnotation注解
+     *
+     * @param mappedStatement MappedStatement
+     * @return TableShardAnnotation注解
+     */
+    private TableShardAnnotation getTableShardAnnotation(MappedStatement mappedStatement) {
+        TableShardAnnotation tableShardAnnotation = null;
+        try {
+            String id = mappedStatement.getId();
+            String className = id.substring(0, id.lastIndexOf("."));
+            String methodName = id.substring(id.lastIndexOf(".") + 1);
+            final Method[] method = Class.forName(className).getMethods();
+            for (Method me : method) {
+                if (me.getName().equals(methodName) && me.isAnnotationPresent(TableShardAnnotation.class)) {
+                    tableShardAnnotation = me.getAnnotation(TableShardAnnotation.class);
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return tableShardAnnotation;
     }
 }

@@ -2,7 +2,7 @@ package com.tuacy.mybatis.interceptor.controller;
 
 import com.tuacy.microservice.framework.common.controller.BaseController;
 import com.tuacy.microservice.framework.common.entity.response.ResponseListEntity;
-import com.tuacy.mybatis.interceptor.entity.param.GetAllUserParam;
+import com.tuacy.mybatis.interceptor.entity.param.AlarmInfoInsetParam;
 import com.tuacy.mybatis.interceptor.entity.vo.UserInfoVo;
 import com.tuacy.mybatis.interceptor.service.IAlarmManageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,9 @@ public class AlarmManageController extends BaseController {
 
 
     @RequestMapping(value = "insert", method = RequestMethod.POST)
-    public ResponseListEntity<UserInfoVo> insertAlarm(@RequestBody GetAllUserParam param) {
+    public ResponseListEntity<UserInfoVo> insertAlarm(@RequestBody AlarmInfoInsetParam param) {
         ResponseListEntity<UserInfoVo> responseDataEntity = new ResponseListEntity<>();
+        alarmManageService.insertAlarm(param);
         return responseDataEntity;
     }
 

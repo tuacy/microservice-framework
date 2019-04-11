@@ -24,7 +24,7 @@ public class DayTableShardStrategy implements ITableShardStrategy {
         BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
         String originSql = boundSql.getSql();
         // 当前时间
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String newTableName = tableName + "_" + sdf.format(new Date());
         return originSql.replaceAll(tableName, newTableName);
     }

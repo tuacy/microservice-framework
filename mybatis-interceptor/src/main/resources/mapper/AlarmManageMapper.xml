@@ -3,5 +3,20 @@
 <mapper namespace="com.tuacy.mybatis.interceptor.mapper.AlarmManageMapper">
 
 
+    <insert id="insertAlarm">
+
+        insert into tablealarmevent (
+            alarmeventid,
+            alarmeventname,
+            alarmlevel,
+            alarmoccurtime
+        ) values (
+            uuid_short(),
+             #{param.alarmEventName},
+             #{param.alarmLevel},
+             #{param.alarmOccurTime}
+         )
+
+   </insert>
 
 </mapper>

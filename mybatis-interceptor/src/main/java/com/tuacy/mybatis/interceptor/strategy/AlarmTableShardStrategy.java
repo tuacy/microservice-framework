@@ -17,7 +17,7 @@ import java.util.Set;
 
 /**
  * 告警表分表策略 -- 根据告警发生时间来分表,天
- * shardParamKey 对应时间格式 YYYY-MM-dd
+ * shardParamKey 对应时间格式 yyyy-MM-dd HH:mm:ss
  */
 public class AlarmTableShardStrategy implements ITableShardStrategy {
 
@@ -64,10 +64,10 @@ public class AlarmTableShardStrategy implements ITableShardStrategy {
         }
         // 确定表名字
         if (alarmOccurTime != null) {
-            SimpleDateFormat parseSdf = new SimpleDateFormat("YYYY-MM-dd");
+            SimpleDateFormat parseSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date occurDate = parseSdf.parse(alarmOccurTime);
-            SimpleDateFormat formatSdf = new SimpleDateFormat("YYYYMMdd");
-            String shardTableName = formatSdf.format(occurDate);
+            SimpleDateFormat formatSdf = new SimpleDateFormat("yyyyMMdd");
+            String shardTableName = tableName + "_" + formatSdf.format(occurDate);
             return originSql.replaceAll(tableName, shardTableName);
         }
         return originSql;

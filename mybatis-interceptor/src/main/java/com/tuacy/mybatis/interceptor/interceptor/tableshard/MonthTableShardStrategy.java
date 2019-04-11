@@ -16,7 +16,7 @@ public class MonthTableShardStrategy implements ITableShardStrategy {
 
         BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
         String originSql = boundSql.getSql();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMM");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
         String newTableName = tableName + "_" + sdf.format(new Date());
         return originSql.replaceAll(tableName, newTableName);
     }
