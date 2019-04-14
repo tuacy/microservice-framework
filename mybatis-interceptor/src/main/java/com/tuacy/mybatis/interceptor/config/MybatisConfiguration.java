@@ -1,5 +1,6 @@
 package com.tuacy.mybatis.interceptor.config;
 
+import com.tuacy.mybatis.interceptor.interceptor.encryptresultfield.EncryptResultFieldInterceptor;
 import com.tuacy.mybatis.interceptor.interceptor.log.LogInterceptor;
 import com.tuacy.mybatis.interceptor.interceptor.page.PageInterceptor;
 import com.tuacy.mybatis.interceptor.interceptor.tableshard.TableShardInterceptor;
@@ -38,6 +39,11 @@ public class MybatisConfiguration {
         properties.setProperty(LogInterceptor.PROPERTIES_KEY_ENABLE_EXECUTOR_TIME, LogInterceptor.ENABLE_EXECUTOR_TIME);
         interceptor.setProperties(properties);
         return interceptor;
+    }
+
+    @Bean
+    public EncryptResultFieldInterceptor JSONInterceptor() {
+        return new EncryptResultFieldInterceptor();
     }
 
 }
