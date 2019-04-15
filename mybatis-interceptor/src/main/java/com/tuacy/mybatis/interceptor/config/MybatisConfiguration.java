@@ -42,7 +42,7 @@ public class MybatisConfiguration {
     }
 
     @Bean
-    public EncryptResultFieldInterceptor JSONInterceptor() {
+    public EncryptResultFieldInterceptor encryptResultFieldInterceptor() {
         return new EncryptResultFieldInterceptor();
     }
 

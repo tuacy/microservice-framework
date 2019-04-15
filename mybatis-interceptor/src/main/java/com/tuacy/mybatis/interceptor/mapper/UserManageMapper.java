@@ -1,7 +1,9 @@
 package com.tuacy.mybatis.interceptor.mapper;
 
 import com.tuacy.mybatis.interceptor.entity.vo.UserInfoVo;
+import com.tuacy.mybatis.interceptor.interceptor.encryptresultfield.EncryptResultFieldAnnotation;
 import com.tuacy.mybatis.interceptor.interceptor.page.PageView;
+import com.tuacy.mybatis.interceptor.strategy.PasswordEncryptStrategy;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,7 @@ import java.util.List;
 @Repository
 public interface UserManageMapper {
 
+    @EncryptResultFieldAnnotation(fieldKey = "password", encryptStrategy = PasswordEncryptStrategy.class)
     List<UserInfoVo> getAllUserList();
 
     List<UserInfoVo> getAllUserListPage(@Param("pageView") PageView pageView);

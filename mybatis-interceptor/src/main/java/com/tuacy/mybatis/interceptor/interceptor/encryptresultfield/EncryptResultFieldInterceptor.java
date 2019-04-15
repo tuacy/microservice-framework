@@ -34,7 +34,7 @@ public class EncryptResultFieldInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         // 获取到返回结果
-        ResultSetHandler resultSetHandler = (ResultSetHandler) invocation;
+        ResultSetHandler resultSetHandler = (ResultSetHandler) invocation.getTarget();
         MetaObject metaResultSetHandler = MetaObject.forObject(resultSetHandler, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, REFLECTOR_FACTORY);
         MappedStatement mappedStatement = (MappedStatement) metaResultSetHandler.getValue("mappedStatement");
         EncryptResultFieldAnnotation annotation = getEncryptResultFieldAnnotation(mappedStatement);
@@ -51,34 +51,32 @@ public class EncryptResultFieldInterceptor implements Interceptor {
                     strategyMap.put(fieldKeyList[index], strategyClassList[index]);
                 }
                 // 对结果进行处理
-                if (returnValue instanceof ArrayList<?>) {
-                    List<?> list = (ArrayList<?>) returnValue;
-                    for (Object returnItem : list) {
-                        MetaObject metaReturnItem = MetaObject.forObject(returnItem, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, REFLECTOR_FACTORY);
-                        for (Map.Entry<String, Class<? extends IEncryptResultFieldStrategy>> entry : strategyMap.entrySet()) {
-                            String fieldKey = entry.getKey();
-                            IEncryptResultFieldStrategy fieldEncryptStrategy = entry.getValue().newInstance();
-                            Object fieldValue = metaReturnItem.getValue(fieldKey);
-                            if (fieldValue instanceof String) {
-                                metaReturnItem.setValue(fieldKey, fieldEncryptStrategy.encrypt((String) fieldValue));
+                try {
+                    if (returnValue instanceof ArrayList<?>) {
+                        List<?> list = (ArrayList<?>) returnValue;
+                        for (int index = 0; index < list.size(); index++) {
+                            Object returnItem = list.get(index);
+                            if (returnItem instanceof String) {
+                                List<String> stringList = (List<String>) list;
+                                IEncryptResultFieldStrategy encryptStrategy = strategyMap.get(fieldKeyList[0]).newInstance();
+                                stringList.set(index, encryptStrategy.encrypt((String) returnItem));
+                            } else {
+                                MetaObject metaReturnItem = MetaObject.forObject(returnItem, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, REFLECTOR_FACTORY);
+                                for (Map.Entry<String, Class<? extends IEncryptResultFieldStrategy>> entry : strategyMap.entrySet()) {
+                                    String fieldKey = entry.getKey();
+                                    IEncryptResultFieldStrategy fieldEncryptStrategy = entry.getValue().newInstance();
+                                    Object fieldValue = metaReturnItem.getValue(fieldKey);
+                                    if (fieldValue instanceof String) {
+                                        metaReturnItem.setValue(fieldKey, fieldEncryptStrategy.encrypt((String) fieldValue));
+                                    }
+                                }
                             }
                         }
                     }
-                } else if (returnValue instanceof Map) {
-                    MetaObject metaReturn = MetaObject.forObject(returnValue, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY, REFLECTOR_FACTORY);
-                    for (Map.Entry<String, Class<? extends IEncryptResultFieldStrategy>> entry : strategyMap.entrySet()) {
-                        String fieldKey = entry.getKey();
-                        IEncryptResultFieldStrategy fieldEncryptStrategy = entry.getValue().newInstance();
-                        Object fieldValue = metaReturn.getValue(fieldKey);
-                        if (fieldValue instanceof String) {
-                            metaReturn.setValue(fieldKey, fieldEncryptStrategy.encrypt((String) fieldValue));
-                        }
-                    }
-
-                } else if (returnValue instanceof String) {
-                    IEncryptResultFieldStrategy encryptStrategy = strategyMap.get(fieldKeyList[0]).newInstance();
-                    returnValue = encryptStrategy.encrypt((String) returnValue);
+                } catch (Exception e) {
+                    // ignore
                 }
+
             }
         }
         return returnValue;
